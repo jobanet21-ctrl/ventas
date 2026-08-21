@@ -2901,8 +2901,22 @@
       }
     }
 
-    window.handleBarcodeScan = handleBarcodeScan;
+    window.handleBarcodeScan = function(rawCode){
+  const code = String(rawCode).trim();
+  if(!code) return;
 
+  goToMainView();
+
+  const items = getBtInventory();
+  const norm = normalizeBt(code);
+  const match = items.find(i => normalizeBt(i.barcode || '') === norm && norm !== '');
+
+  if(match){
+    showScanFoundPopup(match, code);
+  } else {
+    showScanNewPopup(code);
+  }
+};
     scanFoundCancelBtn.addEventListener('click', hideScanFoundPopup);
     scanFoundOverlay.addEventListener('click', (e) => {
       if(e.target === scanFoundOverlay) hideScanFoundPopup();
@@ -2984,9 +2998,9 @@
         const code = scanBuffer;
         scanBuffer = '';
         if(code.length >= SCAN_MIN_LENGTH){
-          e.preventDefault();
-          handleBarcodeScan(code);
-        }
+  e.preventDefault();
+  window.handleBarcodeScan(code);
+}
         return;
       }
       if(e.key.length === 1){

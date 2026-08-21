@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/@zxing/browser@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -3078,55 +3079,44 @@
       hide(phoneView);
     }
 
-    function startBarcodeLoop(){
-  const detector = new BarcodeDetector({
-    formats: [
-      'ean_13','ean_8','upc_a','upc_e','code_128','code_39',
-      'itf','codabar','qr_code'
-    ]
-  });
+function startBarcodeLoop(){
+  if(typeof ZXingBrowser === 'undefined'){
+    phoneStatus.textContent = 'No se pudo cargar el escáner.';
+    return;
+  }
 
-  const ctx = phoneCanvas.getContext('2d', {
-    willReadFrequently: true
-  });
+  const reader = new ZXingBrowser.BrowserMultiFormatReader();
 
-  const loop = async () => {
-        if(!phoneStream || phoneVideo.readyState < 2){
-          scanTimer = requestAnimationFrame(loop);
-          return;
-        }
-        const w = phoneVideo.videoWidth;
-        const h = phoneVideo.videoHeight;
-        if(!w || !h){
-          scanTimer = requestAnimationFrame(loop);
-          return;
-        }
-        phoneCanvas.width = w;
-        phoneCanvas.height = h;
-        ctx.drawImage(phoneVideo, 0, 0, w, h);
+  reader.decodeFromVideoElement(
+    phoneVideo,
+    (result, error) => {
+      if(result){
+        const code = String(result.getText() || '').trim();
+        const now = Date.now();
 
-        try{
-          const results = await detector.detect(phoneCanvas);
-          if(results && results.length){
-            const code = String(results[0].rawValue || '').trim();
-            const now = Date.now();
-            if(code && (code !== lastSentCode || now - lastSentAt > 1200)){
-              lastSentCode = code;
-              lastSentAt = now;
-              if(connection && connection.open){
-                connection.send({ type:'barcode', code });
-                phoneStatus.textContent = '✓ Código enviado: ' + code;
-                setTimeout(() => {
-                  if(phoneStream) phoneStatus.textContent = 'Apunta al código de barras';
-                }, 900);
+        if(code && (code !== lastSentCode || now - lastSentAt > 1200)){
+          lastSentCode = code;
+          lastSentAt = now;
+
+          if(connection && connection.open){
+            connection.send({
+              type: 'barcode',
+              code: code
+            });
+
+            phoneStatus.textContent = '✓ Código enviado: ' + code;
+
+            setTimeout(() => {
+              if(phoneStream){
+                phoneStatus.textContent = 'Apunta al código de barras';
               }
-            }
+            }, 900);
           }
-        }catch(e){}
-        scanTimer = requestAnimationFrame(loop);
-      };
-      loop();
+        }
+      }
     }
+  );
+}
 
     function initPhoneMode(){
       hide(document.getElementById('mainView'));

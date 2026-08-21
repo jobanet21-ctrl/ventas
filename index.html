@@ -2901,6 +2901,8 @@
       }
     }
 
+    window.handleBarcodeScan = handleBarcodeScan;
+
     scanFoundCancelBtn.addEventListener('click', hideScanFoundPopup);
     scanFoundOverlay.addEventListener('click', (e) => {
       if(e.target === scanFoundOverlay) hideScanFoundPopup();
@@ -3179,7 +3181,7 @@ function startBarcodeLoop(){
 
   if(data && data.type === 'barcode' && data.code){
     console.log('✅ CÓDIGO:', data.code);
-    handleBarcodeScan(String(data.code).trim());
+    window.handleBarcodeScan(String(data.code).trim());
   }
 });
         connection.on('close', () => {

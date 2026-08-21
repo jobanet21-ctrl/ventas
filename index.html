@@ -1125,10 +1125,11 @@
   // ---------- Persistence ----------
   function saveSales(){ localStorage.setItem('dailySales', JSON.stringify(sales)); }
   function notifyNewSale(sale){
+  const ganancia = sale.price - sale.cost;
   fetch('https://ntfy.sh/ventas-jobanet-83471234444', {
     method: 'POST',
-    body: `${sale.name} - ${sale.price.toFixed(2)} €`,
-    headers: { 'Title': 'Nueva venta registrada' }
+    body: `Venta: ${sale.price.toFixed(2)} €\nGanancia: ${ganancia.toFixed(2)} €`,
+    headers: { 'Title': sale.name }
   }).catch(() => {});
 }
   function saveHistory(){ localStorage.setItem('salesHistory', JSON.stringify(history)); }

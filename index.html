@@ -3052,6 +3052,32 @@
     let scanTimer = null;
     let lastSentCode = '';
     let lastSentAt = 0;
+    let phoneWakeLock = null;
+    let phoneReconnecting = false;
+
+    function getOrCreatePcPeerId(){
+      let id = localStorage.getItem('ventasPcPeerId');
+      if(!id){
+        id = 'pc-' + Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+        localStorage.setItem('ventasPcPeerId', id);
+      }
+      return id;
+    }
+
+    async function requestWakeLock(){
+      try{
+        if('wakeLock' in navigator){
+          phoneWakeLock = await navigator.wakeLock.request('screen');
+          phoneWakeLock.addEventListener('release', () => { phoneWakeLock = null; });
+        }
+      }catch(e){ /* no crítico */ }
+    }
+
+    document.addEventListener('visibilitychange', async () => {
+      if(document.visibilityState === 'visible' && phoneStream && !phoneWakeLock){
+        await requestWakeLock();
+      }
+    });
 
     function show(el){ el.classList.remove('hidden'); el.classList.add('flex'); }
     function hide(el){ el.classList.add('hidden'); el.classList.remove('flex'); }
@@ -3094,9 +3120,23 @@
           }
         });
       });
-      peer.on('error', () => {
-        phoneStatus.textContent = 'No se pudo conectar con el PC. Vuelve a abrir el enlace.';
-      });
+      connection.on('close', tryReconnect);
+          connection.on('error', tryReconnect);
+        });
+
+        peer.on('disconnected', tryReconnect);
+        peer.on('error', tryReconnect);
+      }
+
+      function tryReconnect(){
+        if(phoneReconnecting) return;
+        phoneReconnecting = true;
+        phoneStatus.textContent = 'Conexión perdida. Reconectando…';
+        if(peer){ try{ peer.destroy(); }catch(e){} }
+        setTimeout(() => { phoneReconnecting = false; connectToPc(); }, 1500);
+      }
+
+      connectToPc();
     }
 
     function stopPhoneScanner(){
@@ -3189,7 +3229,7 @@ function startBarcodeLoop(){
       }
 
       if(peer){ try{ peer.destroy(); }catch(e){} }
-      peer = new Peer(undefined, { debug: 1 });
+      peer = new Peer(getOrCreatePcPeerId(), { debug: 1 });
 
       peer.on('open', id => {
         // El enlace usa la misma página y solo cambia los parámetros.
@@ -3221,8 +3261,17 @@ function startBarcodeLoop(){
         });
       });
 
+       peer.on('disconnected', () => {
+        statusEl.textContent = 'Reconectando…';
+        try{ peer.reconnect(); }catch(e){}
+      });
+
       peer.on('error', err => {
-        statusEl.textContent = 'Error de conexión: ' + (err.type || 'desconocido');
+        if(err && err.type === 'unavailable-id'){
+          statusEl.textContent = 'Ya hay una sesión abierta en otra pestaña con este mismo QR. Ciérrala e inténtalo de nuevo.';
+        } else {
+          statusEl.textContent = 'Error de conexión: ' + (err && err.type ? err.type : 'desconocido');
+        }
       });
     }
 

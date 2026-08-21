@@ -1126,7 +1126,7 @@
   function saveSales(){ localStorage.setItem('dailySales', JSON.stringify(sales)); }
   function notifyNewSale(sale){
   const ganancia = sale.price - sale.cost;
-  fetch('https://ntfy.sh/ventas-jobanet-83471234444', {
+  fetch('https://ntfy.sh/vt7k2Qm9xZpL4wRbN8fA', {
     method: 'POST',
     body: `Venta: ${sale.price.toFixed(2)} €\nGanancia: ${ganancia.toFixed(2)} €`,
     headers: { 'Title': sale.name }

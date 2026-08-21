@@ -3079,19 +3079,18 @@
     }
 
     function startBarcodeLoop(){
-      if(!('BarcodeDetector' in window)){
-        phoneStatus.textContent = 'Este navegador no permite el escaneo nativo. Usa Chrome actualizado.';
-        return;
-      }
-      const detector = new BarcodeDetector({
-        formats: [
-          'ean_13','ean_8','upc_a','upc_e','code_128','code_39',
-          'itf','codabar','qr_code'
-        ]
-      });
-      const ctx = phoneCanvas.getContext('2d', { willReadFrequently:true });
+  const detector = new BarcodeDetector({
+    formats: [
+      'ean_13','ean_8','upc_a','upc_e','code_128','code_39',
+      'itf','codabar','qr_code'
+    ]
+  });
 
-      const loop = async () => {
+  const ctx = phoneCanvas.getContext('2d', {
+    willReadFrequently: true
+  });
+
+  const loop = async () => {
         if(!phoneStream || phoneVideo.readyState < 2){
           scanTimer = requestAnimationFrame(loop);
           return;

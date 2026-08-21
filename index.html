@@ -1124,6 +1124,13 @@
 
   // ---------- Persistence ----------
   function saveSales(){ localStorage.setItem('dailySales', JSON.stringify(sales)); }
+  function notifyNewSale(sale){
+  fetch('https://ntfy.sh/ventas-jobanet-83471234444', {
+    method: 'POST',
+    body: `${sale.name} - ${sale.price.toFixed(2)} €`,
+    headers: { 'Title': 'Nueva venta registrada' }
+  }).catch(() => {});
+}
   function saveHistory(){ localStorage.setItem('salesHistory', JSON.stringify(history)); }
 
   function escapeHtml(str){
@@ -1238,6 +1245,7 @@
     if(!name || isNaN(cost) || isNaN(price)) return;
 
     sales.push({ name, cost, price, ts: Date.now() });
+    notifyNewSale(sales[sales.length - 1]);
     saveSales();
     renderSales();
     scrollToDailySales();
@@ -1264,6 +1272,7 @@
 
       // Va directo a "Ventas de Hoy", sin tocar el formulario de arriba.
       sales.push({ name, cost, price, ts: Date.now() });
+      notifyNewSale(sales[sales.length - 1]);
 
       saveSales();
       renderSales(); // recalcula ganancia, hora y TOTALES automáticamente
@@ -2724,6 +2733,7 @@
           // Registra la venta con los mismos sales[] / saveSales() / renderSales()
           // que usa el resto de la app, y lleva la vista a "Ventas de Hoy".
           sales.push({ name: item.name, cost: item.cost, price: item.sell, ts: Date.now() });
+          notifyNewSale(sales[sales.length - 1]);
           saveSales();
           renderSales();
           scrollToDailySales();
@@ -2885,6 +2895,7 @@
 
     function registerSaleFromScan(item){
       sales.push({ name: item.name, cost: item.cost, price: item.sell, ts: Date.now() });
+      notifyNewSale(sales[sales.length - 1]);
       saveSales();
       renderSales();
       scrollToDailySales();
@@ -3591,6 +3602,7 @@ function startBarcodeLoop(){
             // Igual que los botones SIM: entra directo en "Ventas de Hoy" usando
             // las mismas sales[] / saveSales() / renderSales() ya existentes.
             sales.push({ name: item.name, cost: item.cost, price: item.price, ts: Date.now() });
+            notifyNewSale(sales[sales.length - 1]);
             saveSales();
             renderSales();
             // Nos quedamos en "Gestión de Productos": subimos la página hasta

@@ -3090,34 +3090,49 @@ function startBarcodeLoop(){
   reader.decodeFromVideoElement(
     phoneVideo,
     (result, error) => {
-      if(result){
-        const code = String(result.getText() || '').trim();
-        const now = Date.now();
+      if(!result) return;
 
-        if(code && (code !== lastSentCode || now - lastSentAt > 1200)){
-          lastSentCode = code;
-          lastSentAt = now;
+      const code = String(result.getText() || '').trim();
+      const now = Date.now();
 
-          if(connection && connection.open){
-            connection.send({
-              type: 'barcode',
-              code: code
-            });
+      if(!code || (code === lastSentCode && now - lastSentAt <= 1200)){
+        return;
+      }
 
-            phoneStatus.textContent = '✓ Código enviado: ' + code;
+      lastSentCode = code;
+      lastSentAt = now;
 
-            setTimeout(() => {
-              if(phoneStream){
-                phoneStatus.textContent = 'Apunta al código de barras';
-              }
-            }, 900);
+      if(!connection){
+        phoneStatus.textContent = '❌ No hay conexión con el PC';
+        return;
+      }
+
+      if(!connection.open){
+        phoneStatus.textContent = '❌ Conexión con el PC no disponible';
+        return;
+      }
+
+      try{
+        connection.send({
+          type: 'barcode',
+          code: code
+        });
+
+        phoneStatus.textContent = '✓ Código enviado: ' + code;
+
+        setTimeout(() => {
+          if(phoneStream){
+            phoneStatus.textContent = 'Apunta al código de barras';
           }
-        }
+        }, 900);
+
+      }catch(err){
+        console.error('Error enviando código:', err);
+        phoneStatus.textContent = '❌ Error enviando al PC';
       }
     }
   );
 }
-
     function initPhoneMode(){
       hide(document.getElementById('mainView'));
       hide(document.getElementById('catalogView'));
@@ -3160,11 +3175,13 @@ function startBarcodeLoop(){
           connectedEl.classList.remove('hidden');
         });
         connection.on('data', data => {
-          if(data && data.type === 'barcode' && data.code){
-            // Lanza los mismos popups que ya tenía el escáner USB.
-            handleBarcodeScan(data.code);
-          }
-        });
+  console.log('📱 CÓDIGO RECIBIDO DEL MÓVIL:', data);
+
+  if(data && data.type === 'barcode' && data.code){
+    console.log('✅ CÓDIGO:', data.code);
+    handleBarcodeScan(String(data.code).trim());
+  }
+});
         connection.on('close', () => {
           connectedEl.classList.add('hidden');
           statusEl.textContent = 'Móvil desconectado. Puedes volver a abrir el enlace.';

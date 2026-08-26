@@ -432,7 +432,286 @@
   width: 95% !important;
   max-width: 550px !important;
 }
+/* =========================================================
+   ANIMACIÓN BOTÓN REGISTRAR VENTA
+   ========================================================= */
+
+#registrarVentaAnimado{
+  position: relative;
+  overflow: hidden;
+  min-height: 42px;
 }
+
+#registrarVentaAnimado .rv-texto{
+  display: inline-block;
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+#registrarVentaAnimado .rv-escena{
+  position: absolute;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Luces del fondo */
+#registrarVentaAnimado .rv-luz{
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.7);
+  opacity: .7;
+}
+
+#registrarVentaAnimado .rv-l1{
+  left: 15%;
+  top: 18px;
+}
+
+#registrarVentaAnimado .rv-l2{
+  left: 45%;
+  top: 11px;
+}
+
+#registrarVentaAnimado .rv-l3{
+  left: 75%;
+  top: 22px;
+}
+
+/* Carretera */
+#registrarVentaAnimado .rv-carretera{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 8px;
+  background: rgba(0,0,0,.18);
+}
+
+#registrarVentaAnimado .rv-lineas{
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 100%;
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255,255,255,.8) 0 22px,
+    transparent 22px 42px
+  );
+  animation: rvCarretera 0.35s linear infinite;
+}
+
+@keyframes rvCarretera{
+  from{ transform: translateX(0); }
+  to{ transform: translateX(-42px); }
+}
+
+/* Camión */
+#registrarVentaAnimado .rv-camion{
+  position: absolute;
+  left: -105px;
+  bottom: 8px;
+  width: 86px;
+  height: 28px;
+  animation: rvCamion 1.35s cubic-bezier(.65,0,.2,1) forwards;
+}
+
+@keyframes rvCamion{
+  0%{
+    left: -105px;
+    transform: translateY(0);
+  }
+  15%{
+    transform: translateY(-2px);
+  }
+  85%{
+    transform: translateY(-2px);
+  }
+  100%{
+    left: calc(100% + 20px);
+    transform: translateY(0);
+  }
+}
+
+/* Caja del camión */
+#registrarVentaAnimado .rv-caja{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 58px;
+  height: 25px;
+  border-radius: 4px 2px 2px 4px;
+  background: #f3c969;
+  color: #1C2434;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.12);
+}
+
+/* Cabina */
+#registrarVentaAnimado .rv-cabina{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 31px;
+  height: 25px;
+  background: #d9dce2;
+  border-radius: 3px 7px 3px 2px;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.12);
+}
+
+/* Ventana */
+#registrarVentaAnimado .rv-ventana{
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 18px;
+  height: 9px;
+  border-radius: 2px;
+  background: #526579;
+}
+
+/* Ruedas */
+#registrarVentaAnimado .rv-rueda{
+  position: absolute;
+  bottom: -6px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #171717;
+  border: 3px solid #555;
+}
+
+#registrarVentaAnimado .rv-r1{
+  left: 11px;
+}
+
+#registrarVentaAnimado .rv-r2{
+  right: 7px;
+}
+
+/* Billetes */
+#registrarVentaAnimado .rv-dinero,
+#registrarVentaAnimado .rv-dinero2{
+  position: absolute;
+  font-size: 19px;
+  opacity: 0;
+  animation: rvDinero 1.15s ease-out forwards;
+}
+
+#registrarVentaAnimado .rv-dinero{
+  left: 42%;
+  top: 4px;
+  animation-delay: .35s;
+}
+
+#registrarVentaAnimado .rv-dinero2{
+  left: 58%;
+  top: 15px;
+  animation-delay: .55s;
+}
+
+@keyframes rvDinero{
+  0%{
+    opacity: 0;
+    transform: translateY(8px) rotate(-20deg) scale(.7);
+  }
+  25%{
+    opacity: 1;
+  }
+  100%{
+    opacity: 0;
+    transform: translateY(-22px) rotate(25deg) scale(1);
+  }
+}
+
+/* Mensaje final */
+#registrarVentaAnimado .rv-exito{
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+#registrarVentaAnimado .rv-check{
+  width: 17px;
+  height: 17px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  position: relative;
+}
+
+#registrarVentaAnimado .rv-check::after{
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) scale(0);
+  animation: rvCheck .25s .1s ease forwards;
+}
+
+@keyframes rvCheck{
+  to{
+    transform: rotate(45deg) scale(1);
+  }
+}
+
+/* Estado animando */
+#registrarVentaAnimado.rv-animando .rv-texto{
+  opacity: 0;
+  transform: scale(.8);
+}
+
+#registrarVentaAnimado.rv-animando .rv-escena{
+  display: block;
+}
+
+/* Estado éxito */
+#registrarVentaAnimado.rv-completo .rv-texto,
+#registrarVentaAnimado.rv-completo .rv-escena{
+  display: none;
+}
+
+#registrarVentaAnimado.rv-completo .rv-exito{
+  display: flex;
+  animation: rvExito .35s ease;
+}
+
+@keyframes rvExito{
+  from{
+    opacity: 0;
+    transform: scale(.75);
+  }
+  to{
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  #registrarVentaAnimado .rv-camion,
+  #registrarVentaAnimado .rv-lineas,
+  #registrarVentaAnimado .rv-dinero,
+  #registrarVentaAnimado .rv-dinero2{
+    animation: none !important;
+  }
+}
+```
 </style>
 </head>
 <body class="bg-paper-texture min-h-screen pb-16">
@@ -604,9 +883,41 @@
           <input type="number" id="prodPrice" required step="0.01" placeholder="0.00"
             class="w-full rounded-lg px-3 py-2 text-sm font-mono focus-ring">
         </div>
-        <button type="submit" class="col-span-2 btn-primary rounded-lg py-2.5 text-sm font-600 mt-1">
-          + Registrar Venta
-        </button>
+        <button id="registrarVentaAnimado" type="submit"
+  class="col-span-2 btn-primary rounded-lg py-2.5 text-sm font-600 mt-1">
+
+  <span class="rv-texto">+ Registrar Venta</span>
+
+  <span class="rv-escena">
+    <span class="rv-luz rv-l1"></span>
+    <span class="rv-luz rv-l2"></span>
+    <span class="rv-luz rv-l3"></span>
+
+    <span class="rv-carretera">
+      <span class="rv-lineas"></span>
+    </span>
+
+    <span class="rv-camion">
+      <span class="rv-caja">€</span>
+
+      <span class="rv-cabina">
+        <span class="rv-ventana"></span>
+      </span>
+
+      <span class="rv-rueda rv-r1"></span>
+      <span class="rv-rueda rv-r2"></span>
+    </span>
+
+    <span class="rv-dinero">💵</span>
+    <span class="rv-dinero2">💵</span>
+  </span>
+
+  <span class="rv-exito">
+    <span class="rv-check"></span>
+    <span>Venta Registrada</span>
+  </span>
+
+</button>
       </form>
 
       <!-- ================= SIM QUICK ACCESS SECTION ================= -->
@@ -3714,6 +4025,35 @@ function startBarcodeLoop(){
       mainView.classList.remove('hidden');
     });
   })();
+  // =========================================================
+  // ANIMACIÓN BOTÓN REGISTRAR VENTA
+  // =========================================================
+
+  const botonRegistrarVenta = document.getElementById('registrarVentaAnimado');
+
+  if (botonRegistrarVenta) {
+    botonRegistrarVenta.addEventListener('click', function () {
+
+      // Evita que se ejecute dos veces
+      if (botonRegistrarVenta.classList.contains('rv-animando')) {
+        return;
+      }
+
+      botonRegistrarVenta.classList.add('rv-animando');
+
+      // Después de la animación del camión
+      setTimeout(() => {
+        botonRegistrarVenta.classList.remove('rv-animando');
+        botonRegistrarVenta.classList.add('rv-completo');
+      }, 1400);
+
+      // Volver al botón normal
+      setTimeout(() => {
+        botonRegistrarVenta.classList.remove('rv-completo');
+      }, 3000);
+    });
+  }
+
 </script>
 
 </body>
